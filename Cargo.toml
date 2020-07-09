@@ -11,20 +11,6 @@ name = "rustytk"
 
 [dependencies]
 winit = "0.22"
-gfx-hal = "0.5"
-glsl-to-spirv = "0.1.7"
-
-[build-dependencies]
-glsl-to-spirv = "0.1.7"
-
-[target.'cfg(target_os = "macos")'.dependencies.backend]
-package = "gfx-backend-metal"
-version = "0.5"
-
-[target.'cfg(windows)'.dependencies.backend]
-package = "gfx-backend-dx12"
-version = "0.5"
-
-[target.'cfg(all(unix, not(target_os = "macos")))'.dependencies.backend]
-package = "gfx-backend-vulkan"
-version = "0.5"
+vulkano = "0.19"
+vulkano-win = "0.19"
+vulkano-shaders = "0.19"
