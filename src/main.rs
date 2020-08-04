@@ -1,6 +1,5 @@
-mod lib;
-
+use rustytk::shell;
 
 fn main() {
-    lib::create_window();
+    shell::create_window();
 }

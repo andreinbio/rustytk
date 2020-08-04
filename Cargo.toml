@@ -11,6 +11,7 @@ name = "rustytk"
 
 [dependencies]
 winit = "0.22"
-vulkano = "0.19"
-vulkano-win = "0.19"
-vulkano-shaders = "0.19"
+wgpu = "0.5"
+futures = "0.3"
+shaderc = "0.6"
+
