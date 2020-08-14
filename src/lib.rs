@@ -1,5 +1,6 @@
 extern crate shaderc;
 
-mod shaders;
 mod render;
+mod shaders;
+mod vertex;
 pub mod shell;
