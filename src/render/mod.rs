@@ -71,14 +71,15 @@ impl State {
                 module: &fs_module,
                 entry_point: "main",
             }),
-            rasterization_state: Some(wgpu::RasterizationStateDescriptor {
-                front_face: wgpu::FrontFace::Ccw,
-                cull_mode: wgpu::CullMode::Back,
-                depth_bias: 0,
-                depth_bias_slope_scale: 0.0,
-                depth_bias_clamp: 0.0,
-            }),
-            primitive_topology: wgpu::PrimitiveTopology::PointList,
+            // rasterization_state: Some(wgpu::RasterizationStateDescriptor {
+            //     front_face: wgpu::FrontFace::Ccw,
+            //     cull_mode: wgpu::CullMode::None,
+            //     depth_bias: 0,
+            //     depth_bias_slope_scale: 0.0,
+            //     depth_bias_clamp: 0.0,
+            // }),
+            rasterization_state: None,
+            primitive_topology: wgpu::PrimitiveTopology::TriangleList,
             color_states: &[wgpu::ColorStateDescriptor {
                 format: sc_desc.format,
                 color_blend: wgpu::BlendDescriptor::REPLACE,
@@ -97,16 +98,8 @@ impl State {
             alpha_to_coverage_enabled: false,
         });
 
-        const VERTICES: &[vertex::Vertex] = &[
-            vertex::Vertex { position: [-0.0868241, 0.49240386, 0.0], color: [0.5, 0.0, 0.5] }, // A
-            vertex::Vertex { position: [-0.49513406, 0.06958647, 0.0], color: [0.5, 0.0, 0.5] }, // B
-            vertex::Vertex { position: [-0.21918549, -0.44939706, 0.0], color: [0.5, 0.0, 0.5] }, // C
-            vertex::Vertex { position: [0.35966998, -0.3473291, 0.0], color: [0.5, 0.0, 0.5] }, // D
-            vertex::Vertex { position: [0.44147372, 0.2347359, 0.0],color: [0.5, 0.0, 0.5] }, // E
-        ];
-
         let vertex_buffer = device.create_buffer_with_data(
-            bytemuck::cast_slice(VERTICES),
+            bytemuck::cast_slice(vertex::Vertex::get_vertices_slice().as_slice()),
             wgpu::BufferUsage::VERTEX,
         );
 

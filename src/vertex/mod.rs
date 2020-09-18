@@ -28,4 +28,31 @@ impl Vertex {
             ]
         }
     }
+
+    pub fn get_vertices_slice() -> Vec<Vertex> {
+        let start_pos = (0, 0);
+        let width = 10;
+        let height = 10;
+        let background = [1.0, 0.0, 0.0];
+        let mut vec: Vec<Vertex> = Vec::with_capacity(width * height as usize);
+
+        for y in 0..height {
+            for x in 0..width {
+                vec.push(Vertex {
+                    position: [((start_pos.0 + x) as f32) * 0.01,  ((start_pos.1 + y) as f32) * 0.01, 0.0],
+                    color: background,
+                });
+            }
+        }
+
+        // let vec: Vec<Vertex> = vec![
+        //     Vertex { position: [-0.0868241, 0.49240386, 0.0], color: [0.5, 0.0, 0.5] }, // A
+        //     Vertex { position: [-0.49513406, 0.06958647, 0.0], color: [0.5, 0.0, 0.5] }, // B
+        //     Vertex { position: [-0.21918549, -0.44939706, 0.0], color: [0.5, 0.0, 0.5] }, // C
+        //     Vertex { position: [0.35966998, -0.3473291, 0.0], color: [0.5, 0.0, 0.5] }, // D
+        //     Vertex { position: [0.44147372, 0.2347359, 0.0],color: [0.5, 0.0, 0.5] }, // E
+        // ];
+        // dbg!(&vec);
+        vec
+    }
 }
