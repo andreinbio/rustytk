@@ -11,7 +11,7 @@ name = "rustytk"
 
 [dependencies]
 winit = "0.22"
-wgpu = "0.5"
+wgpu = "0.6"
 futures = "0.3"
 shaderc = "0.6"
 bytemuck = "1.3"

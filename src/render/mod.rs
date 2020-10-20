@@ -1,3 +1,6 @@
+use std::iter;
+use wgpu::util::DeviceExt;
+
 use winit::{event::*, window::Window};
 
 use crate::shaders;
@@ -21,26 +24,29 @@ impl State {
     pub async fn new(window: &Window) -> Self {
         let size = window.inner_size();
 
-        let surface = wgpu::Surface::create(window);
+        let instance = wgpu::Instance::new(wgpu::BackendBit::PRIMARY);
 
-        let adapter = wgpu::Adapter::request(
-            &wgpu::RequestAdapterOptions {
+        let surface = unsafe { instance.create_surface(window) };
+
+        let adapter = instance
+            .request_adapter(&wgpu::RequestAdapterOptions {
                 power_preference: wgpu::PowerPreference::Default,
                 compatible_surface: Some(&surface),
-            },
-            wgpu::BackendBit::PRIMARY, // Vulkan + Metal + DX12 + Browser WebGPU
-        )
-        .await
-        .unwrap();
+            })
+            .await
+            .unwrap();
 
         let (device, queue) = adapter
-            .request_device(&wgpu::DeviceDescriptor {
-                extensions: wgpu::Extensions {
-                    anisotropic_filtering: false,
+            .request_device(
+                &wgpu::DeviceDescriptor {
+                    features: wgpu::Features::empty(),
+                    limits: wgpu::Limits::default(),
+                    shader_validation: true,
                 },
-                limits: Default::default(),
-            })
-            .await;
+                None, // Trace path
+            )
+            .await
+            .unwrap();
 
         let sc_desc = wgpu::SwapChainDescriptor {
             usage: wgpu::TextureUsage::OUTPUT_ATTACHMENT,
@@ -53,16 +59,19 @@ impl State {
 
         let vs_data = shaders::load_compiled_vert();
         let fs_data = shaders::load_compiled_frag();
-        let vs_module = device.create_shader_module(vs_data.as_binary());
-        let fs_module = device.create_shader_module(fs_data.as_binary());
+        let vs_module = device.create_shader_module(wgpu::util::make_spirv(vs_data.as_binary_u8()));
+        let fs_module = device.create_shader_module(wgpu::util::make_spirv(fs_data.as_binary_u8()));
 
         let render_pipeline_layout =
             device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
+                label: Some("Render Pipeline Layout"),
                 bind_group_layouts: &[],
+                push_constant_ranges: &[],
             });
 
         let render_pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
-            layout: &render_pipeline_layout,
+            label: Some("Render Pipeline"),
+            layout: Some(&render_pipeline_layout),
             vertex_stage: wgpu::ProgrammableStageDescriptor {
                 module: &vs_module,
                 entry_point: "main",
@@ -71,15 +80,16 @@ impl State {
                 module: &fs_module,
                 entry_point: "main",
             }),
-            // rasterization_state: Some(wgpu::RasterizationStateDescriptor {
-            //     front_face: wgpu::FrontFace::Ccw,
-            //     cull_mode: wgpu::CullMode::None,
-            //     depth_bias: 0,
-            //     depth_bias_slope_scale: 0.0,
-            //     depth_bias_clamp: 0.0,
-            // }),
-            rasterization_state: None,
-            primitive_topology: wgpu::PrimitiveTopology::TriangleList,
+            rasterization_state: Some(wgpu::RasterizationStateDescriptor {
+                front_face: wgpu::FrontFace::Ccw,
+                cull_mode: wgpu::CullMode::Back,
+                depth_bias: 0,
+                depth_bias_slope_scale: 0.0,
+                depth_bias_clamp: 0.0,
+                clamp_depth: false,
+            }),
+            // primitive_topology: wgpu::PrimitiveTopology::TriangleList,
+            primitive_topology: wgpu::PrimitiveTopology::PointList,
             color_states: &[wgpu::ColorStateDescriptor {
                 format: sc_desc.format,
                 color_blend: wgpu::BlendDescriptor::REPLACE,
@@ -98,10 +108,11 @@ impl State {
             alpha_to_coverage_enabled: false,
         });
 
-        let vertex_buffer = device.create_buffer_with_data(
-            bytemuck::cast_slice(vertex::Vertex::get_vertices_slice().as_slice()),
-            wgpu::BufferUsage::VERTEX,
-        );
+        let vertex_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+            label: Some("Vertex Buffer"),
+            contents: bytemuck::cast_slice(vertex::Vertex::get_vertices_slice(window).as_slice()),
+            usage: wgpu::BufferUsage::VERTEX,
+        });
 
         Self {
             surface,
@@ -122,7 +133,7 @@ impl State {
         self.swap_chain = self.device.create_swap_chain(&self.surface, &self.sc_desc);
     }
 
-    pub fn input(&mut self, event: &WindowEvent) -> bool {
+    pub fn input(&mut self, _event: &WindowEvent) -> bool {
         false
     }
 
@@ -131,8 +142,9 @@ impl State {
     pub fn render(&mut self) {
         let frame = self
             .swap_chain
-            .get_next_texture()
-            .expect("Timeout getting texture");
+            .get_current_frame()
+            .expect("Timeout getting texture")
+            .output;
 
         let mut encoder = self
             .device
@@ -145,23 +157,24 @@ impl State {
                 color_attachments: &[wgpu::RenderPassColorAttachmentDescriptor {
                     attachment: &frame.view,
                     resolve_target: None,
-                    load_op: wgpu::LoadOp::Clear,
-                    store_op: wgpu::StoreOp::Store,
-                    clear_color: wgpu::Color {
-                        r: 0.1,
-                        g: 0.2,
-                        b: 0.3,
-                        a: 1.0,
+                    ops: wgpu::Operations {
+                        load: wgpu::LoadOp::Clear(wgpu::Color {
+                            r: 0.1,
+                            g: 0.2,
+                            b: 0.3,
+                            a: 1.0,
+                        }),
+                        store: true,
                     },
                 }],
                 depth_stencil_attachment: None,
             });
 
             render_pass.set_pipeline(&self.render_pipeline);
-            render_pass.set_vertex_buffer(0, &self.vertex_buffer, 0, 0);
+            render_pass.set_vertex_buffer(0, self.vertex_buffer.slice(..));
             render_pass.draw(0..3, 0..1);
         }
 
-        self.queue.submit(&[encoder.finish()]);
+        self.queue.submit(iter::once(encoder.finish()));
     }
 }

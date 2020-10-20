@@ -1,8 +1,10 @@
+use winit::{window::Window};
+
 #[repr(C)]
 #[derive(Copy, Clone, Debug)]
 pub struct Vertex {
-    pub position: [f32; 3],
-    pub color: [f32; 3],
+    pub position: [f64; 3],
+    pub color: [f64; 3],
 }
 
 unsafe impl bytemuck::Pod for Vertex {}
@@ -21,7 +23,7 @@ impl Vertex {
                     format: wgpu::VertexFormat::Float3,
                 },
                 wgpu::VertexAttributeDescriptor {
-                    offset: mem::size_of::<[f32; 3]>() as wgpu::BufferAddress,
+                    offset: mem::size_of::<[f64; 3]>() as wgpu::BufferAddress,
                     shader_location: 1,
                     format: wgpu::VertexFormat::Float3,
                 },
@@ -29,21 +31,76 @@ impl Vertex {
         }
     }
 
-    pub fn get_vertices_slice() -> Vec<Vertex> {
-        let start_pos = (0, 0);
-        let width = 10;
-        let height = 10;
-        let background = [1.0, 0.0, 0.0];
-        let mut vec: Vec<Vertex> = Vec::with_capacity(width * height as usize);
+    pub fn get_vertices_slice(window: &Window) -> Vec<Vertex> {
+        let position = if let Ok(pos) = window.inner_position() {
+            (pos.x, pos.y)
+        } else {
+            (0, 0)
+        };
+        let scale_factor: f64 = window.scale_factor();
 
-        for y in 0..height {
-            for x in 0..width {
-                vec.push(Vertex {
-                    position: [((start_pos.0 + x) as f32) * 0.01,  ((start_pos.1 + y) as f32) * 0.01, 0.0],
-                    color: background,
-                });
-            }
-        }
+        dbg!((position, scale_factor));
+
+        let start_pos = (position.0, position.1);
+        let width = 10 as i32;
+        let height = 10 as i32;
+        let background = [1.0, 0.0, 0.0];
+        let mut vec: Vec<Vertex> = Vec::with_capacity((width * height) as usize);
+
+        // for y in 0..height {
+        //     for x in 0..width {
+        //         vec.push(Vertex {
+        //             position: [((start_pos.0 + x) as f64) * scale_factor,  ((start_pos.1 + y) as f64) * scale_factor, 0.0],
+        //             color: background,
+        //         });
+        //     }
+        // }
+
+        vec.push(Vertex { position: [-0.0868241, 0.49240386, 0.0], color: [0.5, 0.0, 0.5] });
+        vec.push(Vertex{
+            position: [0.001, 0.002, 0.0],
+            color: background
+        });
+        vec.push(Vertex{
+            position: [0.001, 0.003, 0.0],
+            color: background
+        });
+        vec.push(Vertex{
+            position: [0.001, 0.004, 0.0],
+            color: background
+        });
+        vec.push(Vertex{
+            position: [0.001, 0.005, 0.0],
+            color: background
+        });
+        vec.push(Vertex{
+            position: [0.001, 0.006, 0.0],
+            color: background
+        });
+        vec.push(Vertex{
+            position: [0.001, 0.001, 0.0],
+            color: background
+        });
+        vec.push(Vertex{
+            position: [0.001, 0.002, 0.0],
+            color: background
+        });
+        vec.push(Vertex{
+            position: [0.001, 0.003, 0.0],
+            color: background
+        });
+        vec.push(Vertex{
+            position: [0.001, 0.004, 0.0],
+            color: background
+        });
+        vec.push(Vertex{
+            position: [0.001, 0.005, 0.0],
+            color: background
+        });
+        vec.push(Vertex{
+            position: [0.001, 0.006, 0.0],
+            color: background
+        });
 
         // let vec: Vec<Vertex> = vec![
         //     Vertex { position: [-0.0868241, 0.49240386, 0.0], color: [0.5, 0.0, 0.5] }, // A
