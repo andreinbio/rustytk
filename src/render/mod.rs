@@ -16,7 +16,7 @@ pub struct State {
     render_pipeline: wgpu::RenderPipeline,
 
     vertex_buffer: wgpu::Buffer,
-
+    num_vertices: u32,
     size: winit::dpi::PhysicalSize<u32>,
 }
 
@@ -108,9 +108,12 @@ impl State {
             alpha_to_coverage_enabled: false,
         });
 
+        let vertices = vertex::Vertex::get_vertices_slice(window);
+        let num_vertices = vertices.len() as u32;
+
         let vertex_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("Vertex Buffer"),
-            contents: bytemuck::cast_slice(vertex::Vertex::get_vertices_slice(window).as_slice()),
+            contents: bytemuck::cast_slice(vertices.as_slice()),
             usage: wgpu::BufferUsage::VERTEX,
         });
 
@@ -122,6 +125,7 @@ impl State {
             swap_chain,
             render_pipeline,
             vertex_buffer,
+            num_vertices,
             size,
         }
     }
@@ -159,9 +163,9 @@ impl State {
                     resolve_target: None,
                     ops: wgpu::Operations {
                         load: wgpu::LoadOp::Clear(wgpu::Color {
-                            r: 0.1,
-                            g: 0.2,
-                            b: 0.3,
+                            r: 0.0,
+                            g: 0.0,
+                            b: 0.0,
                             a: 1.0,
                         }),
                         store: true,
@@ -172,7 +176,7 @@ impl State {
 
             render_pass.set_pipeline(&self.render_pipeline);
             render_pass.set_vertex_buffer(0, self.vertex_buffer.slice(..));
-            render_pass.draw(0..3, 0..1);
+            render_pass.draw(0..self.num_vertices, 0..1);
         }
 
         self.queue.submit(iter::once(encoder.finish()));
