@@ -130,11 +130,23 @@ impl State {
         }
     }
 
-    pub fn resize(&mut self, new_size: winit::dpi::PhysicalSize<u32>) {
+    pub fn resize(&mut self, new_size: winit::dpi::PhysicalSize<u32>, window: &Window) {
         self.size = new_size;
         self.sc_desc.width = new_size.width;
         self.sc_desc.height = new_size.height;
         self.swap_chain = self.device.create_swap_chain(&self.surface, &self.sc_desc);
+
+        let vertices = vertex::Vertex::get_vertices_slice(window);
+        let num_vertices = vertices.len() as u32;
+
+        let vertex_buffer = self.device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+            label: Some("Vertex Buffer"),
+            contents: bytemuck::cast_slice(vertices.as_slice()),
+            usage: wgpu::BufferUsage::VERTEX,
+        });
+
+        self.vertex_buffer = vertex_buffer;
+        self.num_vertices = num_vertices;
     }
 
     pub fn input(&mut self, _event: &WindowEvent) -> bool {
