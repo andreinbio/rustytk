@@ -1,5 +1,7 @@
 use winit::{window::Window};
 
+use crate::rustycanvas::CanvasApi;
+
 #[repr(C)]
 #[derive(Copy, Clone, Debug)]
 pub struct Vertex {
@@ -32,6 +34,7 @@ impl Vertex {
     }
 
     pub fn get_vertices_slice(window: &Window) -> Vec<Vertex> {
+        dbg!(CanvasApi::begin_path());
         let position = if let Ok(pos) = window.inner_position() {
             (pos.x, pos.y)
         } else {
