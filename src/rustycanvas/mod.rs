@@ -60,7 +60,7 @@ impl Path2D {
     }
 
     pub fn rect() {
-        unimplemented("rect");
+        unimplemented!("rect");
     }
 }
 
@@ -74,12 +74,13 @@ impl CanvasApi {
             top_left: [-1.0, 1.0],
             width: width,
             height: height,
+            points: vec![],
         }
     }
 
     /// Paths
     pub fn begin_path(&mut self) {
-        self.patsh.push(Path2D::new());
+        self.paths.push(Path2D::new());
     }
 
     pub fn close_path() {
@@ -115,7 +116,7 @@ impl CanvasApi {
     }
 
     pub fn rect() {
-        unimplemented("rect");
+        unimplemented!("rect");
     }
 
     /// Drawing Paths
