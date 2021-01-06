@@ -1,9 +1,10 @@
 
-
+#[derive(Debug)]
 pub struct Path2D {
 
 }
 
+#[derive(Debug)]
 pub struct CanvasApi {
     paths: Vec<Path2D>,
     fill_style: [f32;3],

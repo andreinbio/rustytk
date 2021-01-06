@@ -34,7 +34,6 @@ impl Vertex {
     }
 
     pub fn get_vertices_slice(window: &Window) -> Vec<Vertex> {
-        dbg!(CanvasApi::begin_path());
         let position = if let Ok(pos) = window.inner_position() {
             (pos.x, pos.y)
         } else {
@@ -43,7 +42,11 @@ impl Vertex {
         let scale_factor: f64 = window.scale_factor();
         let inner_size = window.inner_size();
 
-        dbg!((position, scale_factor, inner_size));
+        let mut canvas = CanvasApi::new(inner_size.width, inner_size.height);
+        dbg!(&canvas);
+        dbg!(canvas.begin_path());
+
+        // dbg!((position, scale_factor, inner_size));
 
         let depth = 2.0;
         let top = (-1.0, 1.0);
