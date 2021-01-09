@@ -43,8 +43,10 @@ impl Vertex {
         let inner_size = window.inner_size();
 
         let mut canvas = CanvasApi::new(inner_size.width, inner_size.height);
-        dbg!(&canvas);
-        dbg!(canvas.begin_path());
+        // dbg!(&canvas);
+        // dbg!(canvas.begin_path());
+
+        canvas.line_to(10, 20);
 
         // dbg!((position, scale_factor, inner_size));
 
@@ -56,7 +58,7 @@ impl Vertex {
         let height = 250 as i32;
         let background = [1.0, 0.0, 0.0];
 
-        // some cool match here !!!
+        // some cool math here !!!
         // user coordonate system starts frop 0,0 from top left corner
         // translate user position to window position
         let x_percent = start_pos.0 as f32 * 100.0 / inner_size.width as f32;
@@ -128,7 +130,7 @@ impl Vertex {
 fn get_x_pos(client_x: i32, w_width: u32) -> f32 {
     let depth = 2.0;
     let top = (-1.0, 1.0);
-    // some cool match here !!!
+    // some cool math here !!!
     // user coordonate system starts frop 0,0 from top left corner
     // translate user position to window position
     let x_percent = client_x as f32 * 100.0 / w_width as f32;
@@ -143,7 +145,7 @@ fn get_x_pos(client_x: i32, w_width: u32) -> f32 {
 fn get_y_pos(client_y: i32, w_height: u32) -> f32 {
     let depth = 2.0;
     let top = (-1.0, 1.0);
-    // some cool match here !!!
+    // some cool math here !!!
     // user coordonate system starts frop 0,0 from top left corner
     // translate user position to window position
     let y_percent = client_y as f32 * 100.0 / w_height as f32;
