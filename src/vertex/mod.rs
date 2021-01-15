@@ -45,8 +45,16 @@ impl Vertex {
         let mut canvas = CanvasApi::new(inner_size.width, inner_size.height);
         // dbg!(&canvas);
         // dbg!(canvas.begin_path());
-
+        canvas.begin_path();
         canvas.line_to(10, 20);
+        dbg!(canvas);
+
+        // ctx.beginPath();
+        // ctx.moveTo(50, 140);
+        // ctx.lineTo(150, 60);
+        // ctx.lineTo(250, 140);
+        // ctx.closePath();
+        // ctx.stroke();
 
         // dbg!((position, scale_factor, inner_size));
 

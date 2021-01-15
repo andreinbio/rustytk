@@ -21,6 +21,12 @@ pub struct Path2D {
 }
 
 #[derive(Debug)]
+pub struct Data {
+    points: Vec<[u32;2]>,
+    color: [f32;3],
+}
+
+#[derive(Debug)]
 pub struct CanvasApi {
     path: Option<Path2D>,
     // coordinates conversion
@@ -28,7 +34,7 @@ pub struct CanvasApi {
     height: u32,
     depth: f32,
     top_left: [f32;2],
-    points: Vec<f32>,
+    data: Vec<Data>,
 }
 
 
@@ -53,7 +59,12 @@ impl Path2D {
             start: Point {x: 0, y: 0},
             end: Point {x: 0, y: 0},
         }).start;
-        self.line_to(start_point.x, start_point.y);
+
+        // do nothing if path was closed already
+        // path is closed if start_point == current_possition
+        if self.current_position.x != start_point.x && self.current_position.y != start_point.y {
+            self.line_to(start_point.x, start_point.y);
+        }
     }
 
     /// Update current position with the new coordinates
@@ -114,7 +125,7 @@ impl CanvasApi {
             top_left: [-1.0, 1.0],
             width: width,
             height: height,
-            points: vec![],
+            data: vec![],
         }
     }
 
@@ -160,8 +171,48 @@ impl CanvasApi {
     }
 
     /// Drawing Paths
-    pub fn fill() {
-        unimplemented!("fill");
+    pub fn fill(&mut self) {
+        // close path it it was not closed yet
+        self.close_path();
+
+        // get bounding box
+        let mut x_min = 0;
+        let mut y_min = 0;
+
+        let mut x_max = 0;
+        let mut y_max = 0;
+
+        // prepare the points array
+        let mut points: Vec<[u32;2]> = vec![];
+
+        let path: Path2D = self.path.take().unwrap_or(Path2D::new());
+
+        // iterate over the vectors and get the bounding box
+        // @TODO maybe to get the bounding box during lines construction ?
+        for vector in path.vectors.iter() {
+            let vector_x_min = std::cmp::min(vector.start.x, vector.end.x);
+            let vector_y_min = std::cmp::min(vector.start.y, vector.end.y);
+
+            let vector_x_max = std::cmp::max(vector.start.x, vector.end.x);
+            let vector_y_max = std::cmp::max(vector.start.y, vector.end.y);
+
+            x_min = std::cmp::min(x_min, vector_x_min);
+            y_min = std::cmp::min(y_min, vector_y_min);
+
+            x_max = std::cmp::min(x_max, vector_x_max);
+            y_max = std::cmp::min(y_max, vector_y_max);
+        }
+
+        for y in y_min..=y_max {
+            for x in x_min..=x_max {
+                points.push([x, y]);
+            }
+        }
+
+        self.data.push(Data {
+            points: points,
+            color: path.fill_style,
+        });
     }
 
     pub fn stroke() {
