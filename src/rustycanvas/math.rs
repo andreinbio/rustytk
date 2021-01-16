@@ -33,3 +33,19 @@ pub fn wn_pnpoly(point: &Point, vectors: &Vec<Vector>) -> u32 {
 
     winding_number
 }
+
+pub fn get_line_y_point(x: u32, point_0: &Point, point_1: &Point) -> u32 {
+    let m = (point_0.y as f32 - point_1.y as f32) / (point_0.x as f32 - point_1.x as f32);
+    let c = point_0.y as f32 - point_0.x as f32 * m;
+    let y = m * x as f32 + c;
+
+    (y + 0.5).floor() as u32
+}
+
+pub fn get_line_x_point(y: u32, point_0: &Point, point_1: &Point) -> u32 {
+    let m = (point_0.x as f32 - point_1.x as f32) / (point_0.y as f32 - point_1.y as f32);
+    let c = point_0.x as f32 - point_0.y as f32 * m;
+    let x = m * y as f32 + c;
+
+    (x + 0.5).floor() as u32
+}

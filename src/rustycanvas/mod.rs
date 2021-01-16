@@ -1,12 +1,12 @@
 mod math;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Copy, Clone)]
 pub struct Point {
     x: u32,
     y: u32,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Copy, Clone)]
 pub struct Vector {
     start: Point,
     end: Point,
@@ -22,8 +22,8 @@ pub struct Path2D {
 
 #[derive(Debug)]
 pub struct Data {
-    points: Vec<[u32;2]>,
-    color: [f32;3],
+    pub points: Vec<[u32;2]>,
+    pub color: [f32;3],
 }
 
 #[derive(Debug)]
@@ -34,7 +34,7 @@ pub struct CanvasApi {
     height: u32,
     depth: f32,
     top_left: [f32;2],
-    data: Vec<Data>,
+    pub data: Vec<Data>,
 }
 
 
@@ -62,7 +62,7 @@ impl Path2D {
 
         // do nothing if path was closed already
         // path is closed if start_point == current_possition
-        if self.current_position.x != start_point.x && self.current_position.y != start_point.y {
+        if self.current_position.x != start_point.x || self.current_position.y != start_point.y {
             self.line_to(start_point.x, start_point.y);
         }
     }
@@ -178,6 +178,7 @@ impl CanvasApi {
         // get bounding box
         let mut x_min = 0;
         let mut y_min = 0;
+        let mut first_loop: bool = true;
 
         let mut x_max = 0;
         let mut y_max = 0;
@@ -196,16 +197,24 @@ impl CanvasApi {
             let vector_x_max = std::cmp::max(vector.start.x, vector.end.x);
             let vector_y_max = std::cmp::max(vector.start.y, vector.end.y);
 
-            x_min = std::cmp::min(x_min, vector_x_min);
-            y_min = std::cmp::min(y_min, vector_y_min);
+            if first_loop {
+                x_min = vector_x_min;
+                y_min = vector_y_min;
+                first_loop = false;
+            } else {
+                x_min = std::cmp::min(x_min, vector_x_min);
+                y_min = std::cmp::min(y_min, vector_y_min);
+            }
 
-            x_max = std::cmp::min(x_max, vector_x_max);
-            y_max = std::cmp::min(y_max, vector_y_max);
+            x_max = std::cmp::max(x_max, vector_x_max);
+            y_max = std::cmp::max(y_max, vector_y_max);
         }
 
         for y in y_min..=y_max {
             for x in x_min..=x_max {
-                points.push([x, y]);
+                if math::wn_pnpoly(&Point {x: x, y: y}, &path.vectors) > 0 {
+                    points.push([x, y]);
+                }
             }
         }
 
@@ -215,10 +224,43 @@ impl CanvasApi {
         });
     }
 
-    pub fn stroke() {
-        unimplemented!("stroke");
+    pub fn stroke(&mut self) {
+        // prepare the points array
+        let mut points: Vec<[u32;2]> = vec![];
+
+        let path: Path2D = self.path.take().unwrap_or(Path2D::new());
+
+        // get each vector
+        for vector in path.vectors.iter() {
+            let point_0 = vector.start;
+            let point_1 = vector.end;
+
+            let x_min = std::cmp::min(point_0.x, point_1.x);
+            let y_min = std::cmp::min(point_0.y, point_1.y);
+
+            let x_max = std::cmp::max(point_0.x, point_1.x);
+            let y_max = std::cmp::max(point_0.y, point_1.y);
+
+            let width = x_max - x_min;
+            let height = y_max - y_min;
+
+            if width > height {
+                for x in x_min..=x_max {
+                    let y = math::get_line_y_point(x, &point_0, &point_1);
+                    points.push([x, y]);
+                }
+            } else {
+                for y in y_min..=y_max {
+
+                    let x = math::get_line_x_point(y, &point_0, &point_1);
+                    points.push([x, y]);
+                }
+            }
+        }
+
+        self.data.push(Data {
+            points: points,
+            color: path.stroke_style,
+        });
     }
 }
-
-// check if path is closed => polygon -> use wn_pnpoly to see if a point is in polygon
-// if path is not closed then get the line's points and draw them...
