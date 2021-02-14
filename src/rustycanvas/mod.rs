@@ -16,14 +16,14 @@ pub struct Vector {
 pub struct Path2D {
     current_position: Point,
     vectors: Vec<Vector>,
-    fill_style: [f32;3],
-    stroke_style: [f32;3],
+    fill_style: [f32;4],
+    stroke_style: [f32;4],
 }
 
 #[derive(Debug)]
 pub struct Data {
     pub points: Vec<[u32;2]>,
-    pub color: [f32;3],
+    pub color: [f32;4],
 }
 
 #[derive(Debug)]
@@ -44,8 +44,8 @@ impl Path2D {
         Path2D {
             current_position: Point {x: 0, y: 0},
             vectors: vec![],
-            fill_style: [0.0, 0.0, 0.0],
-            stroke_style: [0.0, 0.0, 0.0],
+            fill_style: [0.0, 0.0, 0.0, 1.0],
+            stroke_style: [0.0, 0.0, 0.0, 1.0],
         }
     }
     /// Paths
@@ -262,5 +262,14 @@ impl CanvasApi {
             points: points,
             color: path.stroke_style,
         });
+    }
+
+    /// Fill and stroke styles
+    pub fn fill_style() {
+
+    }
+
+    pub fn stroke_style(&mut self, color: [f32; 4]) {
+
     }
 }
