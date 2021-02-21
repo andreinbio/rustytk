@@ -16,8 +16,6 @@ pub struct Vector {
 pub struct Path2D {
     current_position: Point,
     vectors: Vec<Vector>,
-    fill_style: [f32;4],
-    stroke_style: [f32;4],
 }
 
 #[derive(Debug)]
@@ -29,12 +27,14 @@ pub struct Data {
 #[derive(Debug)]
 pub struct CanvasApi {
     path: Option<Path2D>,
-    // coordinates conversion
-    width: u32,
-    height: u32,
-    depth: f32,
-    top_left: [f32;2],
     pub data: Vec<Data>,
+    fill_style: [f32;4],
+    stroke_style: [f32;4],
+    // coordinates conversion
+    width: u32, // @TODO not used
+    height: u32, // @TODO not used
+    depth: f32, // @TODO not used
+    top_left: [f32;2], // @TODO not used
 }
 
 
@@ -44,8 +44,6 @@ impl Path2D {
         Path2D {
             current_position: Point {x: 0, y: 0},
             vectors: vec![],
-            fill_style: [0.0, 0.0, 0.0, 1.0],
-            stroke_style: [0.0, 0.0, 0.0, 1.0],
         }
     }
     /// Paths
@@ -120,18 +118,24 @@ impl Path2D {
 impl CanvasApi {
     pub fn new(width: u32, height: u32) -> Self {
         CanvasApi {
+            depth: 2.0, // @TODO not used
+            top_left: [-1.0, 1.0], // @TODO not used
+            width: width, // @TODO not used
+            height: height, // @TODO not used
             path: None,
-            depth: 2.0,
-            top_left: [-1.0, 1.0],
-            width: width,
-            height: height,
             data: vec![],
+            fill_style: [0.0, 0.0, 0.0, 1.0],
+            stroke_style: [0.0, 0.0, 0.0, 1.0],
         }
     }
 
     /// Paths
     pub fn begin_path(&mut self) {
+        // create a new path
         self.path = Some(Path2D::new());
+        // reset the fill and stroke colors
+        self.fill_style = [0.0, 0.0, 0.0, 1.0];
+        self.stroke_style = [0.0, 0.0, 0.0, 1.0];
     }
 
     pub fn close_path(&mut self) {
@@ -220,7 +224,7 @@ impl CanvasApi {
 
         self.data.push(Data {
             points: points,
-            color: path.fill_style,
+            color: self.fill_style,
         });
     }
 
@@ -260,16 +264,16 @@ impl CanvasApi {
 
         self.data.push(Data {
             points: points,
-            color: path.stroke_style,
+            color: self.stroke_style,
         });
     }
 
     /// Fill and stroke styles
-    pub fn fill_style() {
-
+    pub fn fill_style(&mut self, color: [f32;4]) {
+        self.fill_style = color;
     }
 
     pub fn stroke_style(&mut self, color: [f32; 4]) {
-
+        self.stroke_style = color;
     }
 }

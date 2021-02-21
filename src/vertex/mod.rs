@@ -1,6 +1,6 @@
 use winit::{window::Window};
 
-use crate::rustycanvas::CanvasApi;
+use crate::rustycanvas::{CanvasApi,Path2D};
 
 #[repr(C)]
 #[derive(Copy, Clone, Debug)]
@@ -43,12 +43,21 @@ impl Vertex {
         let inner_size = window.inner_size();
 
         let mut canvas = CanvasApi::new(inner_size.width, inner_size.height);
+        // let mut path = Path2D::new();
 
         // Filled triangle
         canvas.begin_path();
         canvas.move_to(25, 25);
         canvas.line_to(105, 25);
         canvas.line_to(25, 105);
+        canvas.fill_style([0.0, 1.0, 0.0, 1.0]);
+        canvas.fill();
+
+        canvas.begin_path();
+        canvas.move_to(30, 30);
+        canvas.line_to(110, 30);
+        canvas.line_to(30, 110);
+        canvas.fill_style([1.0, 0.0, 0.0, 1.0]);
         canvas.fill();
 
         // Stroked triangle
