@@ -1,10 +1,9 @@
 mod math;
+mod point;
+mod arc;
 
-#[derive(Debug, Copy, Clone)]
-pub struct Point {
-    x: u32,
-    y: u32,
-}
+use point::Point;
+use arc::Arc;
 
 #[derive(Debug, Copy, Clone)]
 pub struct Vector {
@@ -12,10 +11,23 @@ pub struct Vector {
     end: Point,
 }
 
+#[derive(Debug, Copy, Clone)]
+enum PathType {
+    Vector,
+    Arc,
+}
+
+#[derive(Debug, Copy, Clone)]
+struct Section {
+    path_type: PathType,
+    arc: Option<Arc>,
+    vector: Option<Vector>,
+}
+
 #[derive(Debug)]
 pub struct Path2D {
     current_position: Point,
-    vectors: Vec<Vector>,
+    sections: Vec<Section>,
 }
 
 #[derive(Debug)]
@@ -37,13 +49,11 @@ pub struct CanvasApi {
     top_left: [f32;2], // @TODO not used
 }
 
-
-
 impl Path2D {
     pub fn new() -> Self {
         Path2D {
             current_position: Point {x: 0, y: 0},
-            vectors: vec![],
+            sections: vec![],
         }
     }
     /// Paths
@@ -53,10 +63,12 @@ impl Path2D {
 
     /// Add the last line between the last provided point and the start point from the first vector
     pub fn close_path(&mut self) {
-        let start_point: Point = self.vectors.get(0).cloned().unwrap_or(Vector {
+        let start_point: Point = self.sections.get(0).cloned().unwrap_or(Vector {
             start: Point {x: 0, y: 0},
             end: Point {x: 0, y: 0},
         }).start;
+
+        let start_point: Point = self.sections.get(0).cloned().unwrap_or_else(Section);
 
         // do nothing if path was closed already
         // path is closed if start_point == current_possition
@@ -175,9 +187,16 @@ impl CanvasApi {
     }
 
     /// Drawing Paths
+    ///
+    /// Get all the points from inside the geometric form
     pub fn fill(&mut self) {
-        // close path it it was not closed yet
+        // close path if it was not closed yet
         self.close_path();
+
+        // prepare the points array
+        let mut points: Vec<[u32;2]> = vec![];
+
+        let path: Path2D = self.path.take().unwrap_or(Path2D::new());
 
         // get bounding box
         let mut x_min = 0;
@@ -186,11 +205,6 @@ impl CanvasApi {
 
         let mut x_max = 0;
         let mut y_max = 0;
-
-        // prepare the points array
-        let mut points: Vec<[u32;2]> = vec![];
-
-        let path: Path2D = self.path.take().unwrap_or(Path2D::new());
 
         // iterate over the vectors and get the bounding box
         // @TODO maybe to get the bounding box during lines construction ?
@@ -216,6 +230,7 @@ impl CanvasApi {
 
         for y in y_min..=y_max {
             for x in x_min..=x_max {
+                // if the point is inside the polygon then use it
                 if math::wn_pnpoly(&Point {x: x, y: y}, &path.vectors) > 0 {
                     points.push([x, y]);
                 }
@@ -228,6 +243,7 @@ impl CanvasApi {
         });
     }
 
+    /// Get outline points from the geometric form
     pub fn stroke(&mut self) {
         // prepare the points array
         let mut points: Vec<[u32;2]> = vec![];
@@ -269,10 +285,13 @@ impl CanvasApi {
     }
 
     /// Fill and stroke styles
+    ///
+    /// Change fill color
     pub fn fill_style(&mut self, color: [f32;4]) {
         self.fill_style = color;
     }
 
+    /// Change stroke color
     pub fn stroke_style(&mut self, color: [f32; 4]) {
         self.stroke_style = color;
     }
