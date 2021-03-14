@@ -1,15 +1,11 @@
 mod math;
 mod point;
 mod arc;
+mod vector;
 
 use point::Point;
 use arc::Arc;
-
-#[derive(Debug, Copy, Clone)]
-pub struct Vector {
-    start: Point,
-    end: Point,
-}
+use vector::Vector;
 
 #[derive(Debug, Copy, Clone)]
 enum PathType {
