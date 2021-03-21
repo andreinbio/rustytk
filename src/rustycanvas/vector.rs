@@ -1,7 +1,7 @@
 use super::point::Point;
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Default)]
 pub struct Vector {
-    start: Point,
-    end: Point,
+    pub start: Point,
+    pub end: Point,
 }

@@ -84,9 +84,7 @@ impl State {
             vertex: wgpu::VertexState {
                 module: &vs_module,
                 entry_point: "main",
-                buffers: &[
-                    vertex::Vertex::desc(),
-                ],
+                buffers: &[vertex::Vertex::desc()],
             },
             fragment: Some(wgpu::FragmentState {
                 module: &fs_module,
@@ -96,12 +94,12 @@ impl State {
                     color_blend: wgpu::BlendState {
                         src_factor: wgpu::BlendFactor::One,
                         dst_factor: wgpu::BlendFactor::OneMinusSrcAlpha,
-                        operation: wgpu::BlendOperation::Add
+                        operation: wgpu::BlendOperation::Add,
                     },
                     alpha_blend: wgpu::BlendState {
                         src_factor: wgpu::BlendFactor::One,
                         dst_factor: wgpu::BlendFactor::Zero,
-                        operation: wgpu::BlendOperation::Add
+                        operation: wgpu::BlendOperation::Add,
                     },
                     write_mask: wgpu::ColorWrite::ALL,
                 }],
@@ -152,11 +150,13 @@ impl State {
         let vertices = vertex::Vertex::get_vertices_slice(window);
         let num_vertices = vertices.len() as u32;
 
-        let vertex_buffer = self.device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("Vertex Buffer"),
-            contents: bytemuck::cast_slice(vertices.as_slice()),
-            usage: wgpu::BufferUsage::VERTEX,
-        });
+        let vertex_buffer = self
+            .device
+            .create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                label: Some("Vertex Buffer"),
+                contents: bytemuck::cast_slice(vertices.as_slice()),
+                usage: wgpu::BufferUsage::VERTEX,
+            });
 
         self.vertex_buffer = vertex_buffer;
         self.num_vertices = num_vertices;

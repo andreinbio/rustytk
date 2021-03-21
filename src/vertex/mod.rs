@@ -1,12 +1,12 @@
-use winit::{window::Window};
+use winit::window::Window;
 
-use crate::rustycanvas::{CanvasApi,Path2D};
+use crate::rustycanvas::{CanvasApi, Path2D};
 
 #[repr(C)]
 #[derive(Copy, Clone, Debug)]
 pub struct Vertex {
-    pub position: [f32;3],
-    pub color: [f32;4],
+    pub position: [f32; 3],
+    pub color: [f32; 4],
 }
 
 unsafe impl bytemuck::Pod for Vertex {}
@@ -25,11 +25,11 @@ impl Vertex {
                     format: wgpu::VertexFormat::Float3,
                 },
                 wgpu::VertexAttribute {
-                    offset: mem::size_of::<[f32;3]>() as wgpu::BufferAddress,
+                    offset: mem::size_of::<[f32; 3]>() as wgpu::BufferAddress,
                     shader_location: 1,
                     format: wgpu::VertexFormat::Float4,
                 },
-            ]
+            ],
         }
     }
 
@@ -86,7 +86,6 @@ impl Vertex {
         vec
     }
 }
-
 
 fn get_x_pos(client_x: u32, w_width: u32) -> f32 {
     let depth = 2.0;

@@ -6,7 +6,8 @@ use super::{Point, Vector};
 //  =0 for P2 on the line
 //  <0 for P2 right of the line
 fn is_left(p0: &Point, p1: &Point, p2: &Point) -> i32 {
-    (p1.x as i32 - p0.x as i32) * (p2.y as i32 - p0.y as i32) - (p2.x as i32 - p0.x as i32) * (p1.y as i32 - p0.y as i32)
+    (p1.x as i32 - p0.x as i32) * (p2.y as i32 - p0.y as i32)
+        - (p2.x as i32 - p0.x as i32) * (p1.y as i32 - p0.y as i32)
 }
 
 /// Winding number test for a point in a polygon
@@ -15,7 +16,8 @@ pub fn wn_pnpoly(point: &Point, vectors: &[Vector]) -> u32 {
     let mut winding_number: u32 = 0;
 
     // loop through all edges of the polygon
-    for vector in vectors.iter() { // edge from i] to  V[i+1]
+    for vector in vectors.iter() {
+        // edge from i] to  V[i+1]
         if vector.start.y <= point.y {
             if vector.end.y > point.y {
                 if is_left(&vector.start, &vector.end, point) > 0 {

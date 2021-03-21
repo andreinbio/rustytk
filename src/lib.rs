@@ -1,7 +1,7 @@
 extern crate shaderc;
 
 mod render;
-mod shaders;
-mod vertex;
-pub mod shell;
 pub mod rustycanvas;
+mod shaders;
+pub mod shell;
+mod vertex;
