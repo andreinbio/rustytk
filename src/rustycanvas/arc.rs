@@ -11,6 +11,10 @@ pub struct Arc {
 }
 
 impl Arc {
+    pub fn new(x: u32, y: u32, radius: u32, start_angle: u32, end_angle: u32, anticlockwise: bool) -> Self {
+        Arc {x, y, radius, start_angle, end_angle, anticlockwise}
+    }
+
     pub fn get_start_point(&self) -> Point {
         Point::default()
     }

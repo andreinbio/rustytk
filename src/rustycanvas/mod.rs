@@ -112,8 +112,11 @@ impl Path2D {
         unimplemented!("quadratic_curve_to");
     }
 
-    pub fn arc() {
-        unimplemented!("arc");
+    pub fn arc(&mut self, x: u32, y: u32, radius: u32, start_angle: u32, end_angle: u32, anticlockwise: bool) {
+        self.sections.push(Section {
+            arc: Some(Arc::new(x, y, radius, start_angle, end_angle, anticlockwise)),
+            ..Default::default()
+        });
     }
 
     pub fn arc_to() {
@@ -172,8 +175,8 @@ impl CanvasApi {
         unimplemented!("quadratic_curve_to");
     }
 
-    pub fn arc() {
-        unimplemented!("arc");
+    pub fn arc(&mut self, x: u32, y: u32, radius: u32, start_angle: u32, end_angle: u32, anticlockwise: bool) {
+        self.path.as_mut().map(|path| path.arc(x, y, radius, start_angle, end_angle, anticlockwise));
     }
 
     pub fn arc_to() {

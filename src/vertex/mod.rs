@@ -68,6 +68,11 @@ impl Vertex {
         canvas.close_path();
         canvas.stroke();
 
+        // Circle
+        canvas.begin_path();
+        canvas.move_to(200, 200);
+        canvas.arc(250, 250, 50, 0, 90, false);
+
         let mut vec: Vec<Vertex> = vec![];
 
         for data in canvas.data.iter() {
