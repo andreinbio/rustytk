@@ -68,6 +68,15 @@ impl Vertex {
         canvas.close_path();
         canvas.stroke();
 
+        // Stroked triangle
+        canvas.begin_path();
+        canvas.move_to(325, 125);
+        canvas.line_to(325, 45);
+        canvas.line_to(245, 325);
+        canvas.line_width(4);
+        canvas.close_path();
+        canvas.stroke();
+
         // Circle
         canvas.begin_path();
         canvas.move_to(200, 200);

@@ -330,13 +330,21 @@ impl CanvasApi {
             for x in x_min..=x_max {
                 let y = math::get_line_y_point(x, &point_0, &point_1);
                 points.push([x, y]);
+                points.push([x + 1, math::get_line_y_point(x + 1, &Point {x:point_0.x + 1 , y: point_0.y + 1}, &Point {x: point_1.x + 1, y: point_1.y + 1})]);
+                points.push([x - 1, math::get_line_y_point(x - 1, &Point {x: point_0.x - 1, y: point_0.y - 1}, &Point {x: point_1.x - 1, y: point_1.y -1})]);
             }
         } else {
             for y in y_min..=y_max {
                 let x = math::get_line_x_point(y, &point_0, &point_1);
                 points.push([x, y]);
+                points.push([math::get_line_x_point(y + 1, &point_0, &point_1), y + 1]);
+                points.push([math::get_line_x_point(y - 1, &point_0, &point_1), y - 1]);
             }
         }
+    }
+
+    pub fn line_width(&mut self, width: u32) {
+        self.line_width = width;
     }
 
     /// Fill and stroke styles
