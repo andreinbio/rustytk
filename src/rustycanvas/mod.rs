@@ -40,6 +40,7 @@ pub struct Data {
 pub struct CanvasApi {
     path: Option<Path2D>,
     pub data: Vec<Data>,
+    line_width: u32,
     fill_style: [f32; 4],
     stroke_style: [f32; 4],
     // coordinates conversion
@@ -141,6 +142,7 @@ impl CanvasApi {
             height: height,        // @TODO not used
             path: None,
             data: vec![],
+            line_width: 1,
             fill_style: [0.0, 0.0, 0.0, 1.0],
             stroke_style: [0.0, 0.0, 0.0, 1.0],
         }
@@ -304,62 +306,37 @@ impl CanvasApi {
                 Vector::default()
             };
 
-            let point_0 = vector.start;
-            let point_1 = vector.end;
-
-            let x_min = std::cmp::min(point_0.x, point_1.x);
-            let y_min = std::cmp::min(point_0.y, point_1.y);
-
-            let x_max = std::cmp::max(point_0.x, point_1.x);
-            let y_max = std::cmp::max(point_0.y, point_1.y);
-
-            let width = x_max - x_min;
-            let height = y_max - y_min;
-
-            if width > height {
-                for x in x_min..=x_max {
-                    let y = math::get_line_y_point(x, &point_0, &point_1);
-                    points.push([x, y]);
-                }
-            } else {
-                for y in y_min..=y_max {
-                    let x = math::get_line_x_point(y, &point_0, &point_1);
-                    points.push([x, y]);
-                }
-            }
+            self.draw_line(&mut points, &vector.start, &vector.end);
         }
-
-        // get each vector
-        // for vector in path.vectors.iter() {
-        //     let point_0 = vector.start;
-        //     let point_1 = vector.end;
-
-        //     let x_min = std::cmp::min(point_0.x, point_1.x);
-        //     let y_min = std::cmp::min(point_0.y, point_1.y);
-
-        //     let x_max = std::cmp::max(point_0.x, point_1.x);
-        //     let y_max = std::cmp::max(point_0.y, point_1.y);
-
-        //     let width = x_max - x_min;
-        //     let height = y_max - y_min;
-
-        //     if width > height {
-        //         for x in x_min..=x_max {
-        //             let y = math::get_line_y_point(x, &point_0, &point_1);
-        //             points.push([x, y]);
-        //         }
-        //     } else {
-        //         for y in y_min..=y_max {
-        //             let x = math::get_line_x_point(y, &point_0, &point_1);
-        //             points.push([x, y]);
-        //         }
-        //     }
-        // }
 
         self.data.push(Data {
             points: points,
             color: self.stroke_style,
         });
+    }
+
+    /// Draw a line between 2 points, take into account line width as well
+    pub fn draw_line(&mut self, points: &mut Vec<[u32; 2]>, point_0: &Point, point_1: &Point) {
+        let x_min = std::cmp::min(point_0.x, point_1.x);
+        let y_min = std::cmp::min(point_0.y, point_1.y);
+
+        let x_max = std::cmp::max(point_0.x, point_1.x);
+        let y_max = std::cmp::max(point_0.y, point_1.y);
+
+        let width = x_max - x_min;
+        let height = y_max - y_min;
+
+        if width > height {
+            for x in x_min..=x_max {
+                let y = math::get_line_y_point(x, &point_0, &point_1);
+                points.push([x, y]);
+            }
+        } else {
+            for y in y_min..=y_max {
+                let x = math::get_line_x_point(y, &point_0, &point_1);
+                points.push([x, y]);
+            }
+        }
     }
 
     /// Fill and stroke styles
