@@ -2,7 +2,7 @@
 name = "rustytk"
 version = "0.1.0"
 authors = ["Andrei Nagacevschi <andrein_bio@yahoo.com>"]
-edition = "2018"
+edition = "2021"
 
 [lib]
 name = "rustytk"
@@ -11,7 +11,7 @@ name = "rustytk"
 
 [dependencies]
 winit = "0.24"
-wgpu = "0.7"
+wgpu = { version = "0.11", features = ["spirv"] }
 futures = "0.3"
 shaderc = "0.7"
 bytemuck = "1.4"
